@@ -1,0 +1,17 @@
+@startuml
+!include https://raw.githubusercontent.com/kirchsth/C4-PlantUML/extended/C4_Container.puml
+
+AddRelTag("sync", $textColor="black", $lineColor="black", $lineStyle = DashedLine())
+
+LAYOUT_WITH_LEGEND()
+
+title LangPortal - Context Diagram
+
+Person(Student, "Student", "Learns language on the portal")
+Person(Teacher, "Teacher", "Manages courses on the portal")
+System_Ext(LangPortal, "LangPortal", "Portal for language learning")
+System_Ext(LLM, "LLM", "Large language model")
+
+Rel_D(Student, LangPortal, "Learns language", $tags="sync")
+Rel_D(Teacher, LangPortal, "Manages courses", $tags="sync")
+Rel_D(LangPortal, LLM, "Uses LLM behind the scenes", $tags="sync")
