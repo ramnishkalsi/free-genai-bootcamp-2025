@@ -1,0 +1,74 @@
+
+@startuml ArchDiagram1
+
+actor User
+
+participant "Context \nConstruction" as CC #AEC6CF
+participant "Input \nGuardrails" as IGR #AEC6CF
+participant "LLM \nAPI" as LLMAPI #AEC6CF
+participant "Routing\n" as Routing #AEC6CF
+participant "Generation\n" as Generation #AEC6CF
+participant "Scoring\n" as Scoring #AEC6CF
+participant "Output \nGuardrails" as OGR #AEC6CF
+
+
+User -> CC: Query
+CC -> CC: Construct Context e.g. \n RAG, Agent, Query rewriting
+CC -> IGR: Forward query
+IGR -> IGR: Check input
+note right
+Content filtering,
+Validation,
+Security,
+Bias detection.
+Context appropriateness,
+User safety
+end note
+IGR -> LLMAPI: Send query to LLM
+group LLM Boundary
+LLMAPI -> Routing: Forward query
+Routing -> Routing: Understand query \n and route to \n appropriate model
+note left
+Query Classification, 
+Model Selection, 
+Model Routing, 
+Load Balancing, 
+Specialization, 
+Fallback Mechanism, 
+Efficiency
+end note
+
+Routing -> Generation: Call to generate output
+Generation -> Generation: Generate output \n based on model
+note left
+Text Generation, 
+Context understanding, 
+Creativity and variability,
+Language fluency,
+task specific output,
+Adherence to constraints
+end note
+Generation -> Scoring: Forward output
+Scoring -> Scoring: Score output \n based on model
+note left
+Quality assessment,
+Ranking outputs,
+Probability estimation,
+Bias mitigation,
+Optimization,
+User preferences
+end note
+end LLM Boundary
+Scoring -> OGR: Forward output
+OGR -> OGR: Apply guardrails \n on output
+note left
+Content filtering,
+Bias mitigation,
+Compliance,
+Quality control,
+User safety,
+Context appropriateness
+end note
+OGR -> User: Return Response
+
+@enduml
