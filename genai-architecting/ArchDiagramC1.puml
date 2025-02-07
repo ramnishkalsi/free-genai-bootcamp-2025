@@ -9,7 +9,7 @@ title LangPortal - Context Diagram
 
 Person(Student, "Student", "Learns language on the portal")
 Person(Teacher, "Teacher", "Manages courses on the portal")
-System_Ext(LangPortal, "LangPortal", "Portal for language learning")
+Container(LangPortal, "Language Portal", "JS", "Allows students to learn a language")
 System_Ext(LLM, "LLM", "Large language model")
 
 Rel_D(Student, LangPortal, "Learns language", $tags="sync")
