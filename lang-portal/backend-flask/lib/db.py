@@ -3,7 +3,7 @@ import json
 from flask import g
 
 class Db:
-  def __init__(self, database='words.db'):
+  def __init__(self, database='../db/app.db'):
     self.database = database
     self.connection = None
 
