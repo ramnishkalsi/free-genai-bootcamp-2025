@@ -6,9 +6,11 @@ import math
 def load(app):
   # todo /study_sessions POST
 
-  @app.route('/api/study-sessions', methods=['GET'])
+  @app.route('/api/study-sessions', methods=['GET', 'OPTIONS'])
   @cross_origin()
   def get_study_sessions():
+    if request.method == 'OPTIONS':
+      return '', 200
     try:
       cursor = app.db.cursor()
       
@@ -151,9 +153,11 @@ def load(app):
     except Exception as e:
       return jsonify({"error": str(e)}), 500
 
-  @app.route('/api/study-sessions', methods=['POST'])
+  @app.route('/api/study-sessions', methods=['POST', 'OPTIONS'])
   @cross_origin()
   def create_study_session():
+    if request.method == 'OPTIONS':
+      return '', 200
     try:
       # Extract data from request
       data = request.get_json()

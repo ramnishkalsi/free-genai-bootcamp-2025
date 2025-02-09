@@ -1,0 +1,103 @@
+{
+  "info": {
+    "name": "Study Sessions API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Study Session",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:5000/api/study-sessions",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "study-sessions"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"group_id\": 1,\n    \"study_activity_id\": 1\n}"
+        }
+      }
+    },
+    {
+      "name": "List Study Sessions",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:5000/api/study-sessions?page=1&per_page=10",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "study-sessions"],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "per_page",
+              "value": "10"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Study Session",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:5000/api/study-sessions/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "study-sessions", "1"]
+        }
+      }
+    },
+    {
+      "name": "Record Word Review",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:5000/api/study-sessions/1/review",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "study-sessions", "1", "review"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"word_id\": 1,\n    \"correct\": true\n}"
+        }
+      }
+    },
+    {
+      "name": "Reset Study History",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "http://localhost:5000/api/study-sessions/reset",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "study-sessions", "reset"]
+        }
+      }
+    }
+  ]
+} 
