@@ -1,0 +1,99 @@
+---
+description: Rules for sqllite3
+globs: *.py
+---
+
+1. **Always Use Context Managers and Proper Connection Handling**
+```python:lib/db.py
+# ❌ BAD - Connections might not get closed
+def bad_connection():
+    conn = sqlite3.connect('database.db')
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM users")
+    return cur.fetchall()
+
+# ✅ GOOD - Using context managers
+def good_connection():
+    try:
+        with sqlite3.connect('database.db') as conn:
+            conn.row_factory = sqlite3.Row  # Return rows as dictionaries
+            with conn.cursor() as cur:
+                cur.execute("SELECT * FROM users")
+                return cur.fetchall()
+    except sqlite3.Error as e:
+        current_app.logger.error(f"Database error: {e}")
+        raise
+```
+
+2. **Handle Transactions Properly**
+```python:app/routes.py
+# ❌ BAD - No transaction management
+def bad_transaction():
+    conn = sqlite3.connect('database.db')
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET balance = balance - 100 WHERE id = 1")
+    cur.execute("UPDATE users SET balance = balance + 100 WHERE id = 2")
+    conn.commit()
+
+# ✅ GOOD - Proper transaction handling
+def good_transaction():
+    try:
+        with sqlite3.connect('database.db') as conn:
+            with conn.cursor() as cur:
+                cur.execute("BEGIN TRANSACTION")
+                try:
+                    cur.execute("UPDATE users SET balance = balance - ? WHERE id = ?", (100, 1))
+                    cur.execute("UPDATE users SET balance = balance + ? WHERE id = ?", (100, 2))
+                    conn.commit()
+                except Exception as e:
+                    conn.rollback()
+                    raise
+    except sqlite3.Error as e:
+        current_app.logger.error(f"Transaction failed: {e}")
+        raise
+```
+
+3. **Use Parameter Binding and Proper Query Construction**
+```python:lib/db.py
+# ❌ BAD - SQL Injection risk
+def bad_query(user_id):
+    cursor.execute(f"SELECT * FROM users WHERE id = {user_id}")
+
+# ✅ GOOD - Safe parameter binding
+def good_query(user_id):
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                # Use ? for SQLite parameter binding
+                cur.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+                return cur.fetchone()
+    except sqlite3.Error as e:
+        current_app.logger.error(f"Query failed: {e}")
+        raise
+```
+
+4. **Implement Proper Error Handling**
+```python:app/database.py
+def safe_database_operation():
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                try:
+                    # Database operations
+                    cur.execute("SELECT * FROM users")
+                    return cur.fetchall()
+                except sqlite3.IntegrityError:
+                    # Handle constraint violations
+                    current_app.logger.error("Constraint violation")
+                    raise
+                except sqlite3.OperationalError as e:
+                    # Handle operational errors
+                    current_app.logger.error(f"Operational error: {e}")
+                    raise
+    except sqlite3.Error as e:
+        # Handle all other SQLite errors
+        current_app.logger.error(f"Database error: {e}")
+        raise
+```
+
+

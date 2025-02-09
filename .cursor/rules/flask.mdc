@@ -1,0 +1,156 @@
+---
+description: Rules for flask code
+globs: /lang-portal/backend-flask/*
+---
+
+# Your rule content
+@lang-portal/backend-flask/*
+
+1. **Rule: Always Use Safe Database Queries**
+```python:app/database.py
+# ❌ BAD - Never do this
+@app.route('/user/<username>')
+def bad_user_query(username):
+    cur.execute(f"SELECT * FROM users WHERE username = '{username}'")  # SQL Injection risk!
+
+# ✅ GOOD - Always use parameterized queries
+@app.route('/user/<username>')
+def good_user_query(username):
+    try:
+        with get_db_cursor() as cur:
+            cur.execute("SELECT * FROM users WHERE username = %s", (username,))
+            user = cur.fetchone()
+            return jsonify(user) if user else ('User not found', 404)
+    except Exception as e:
+        current_app.logger.error(f"Database error: {e}")
+        return 'Database error', 500
+```
+
+2. **Rule: Properly Manage Database Connections**
+```python:app/database.py
+# ❌ BAD - Leaving connections open
+def bad_connection():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM users")
+    return cur.fetchall()  # Connection stays open!
+
+# ✅ GOOD - Using context managers
+def good_connection():
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT * FROM users")
+                return cur.fetchall()
+    except Exception as e:
+        current_app.logger.error(f"Database error: {e}")
+        raise
+    # Connection and cursor automatically closed
+```
+
+3. **Rule: Handle Database Errors Gracefully**
+```python:app/routes.py
+from psycopg2 import DatabaseError
+from flask import current_app
+
+@app.route('/api/create_user', methods=['POST'])
+def create_user():
+    try:
+        data = request.get_json()
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "INSERT INTO users (name, email) VALUES (%s, %s) RETURNING id",
+                    (data['name'], data['email'])
+                )
+                conn.commit()
+                user_id = cur.fetchone()[0]
+                current_app.logger.info(f"Created user with ID: {user_id}")
+                return jsonify({'id': user_id}), 201
+                
+    except DatabaseError as e:
+        conn.rollback()  # Roll back on database errors
+        current_app.logger.error(f"Database error: {e}")
+        return jsonify({'error': 'Database operation failed'}), 500
+    except KeyError as e:
+        current_app.logger.error(f"Missing required field: {e}")
+        return jsonify({'error': f'Missing required field: {e}'}), 400
+    except Exception as e:
+        current_app.logger.error(f"Unexpected error: {e}")
+        return jsonify({'error': 'Internal server error'}), 500
+```
+
+4. **Always Use Context Managers for Database Operations**
+```python:app/database.py
+# ❌ BAD - Don't do this
+def bad_query():
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM users")
+    data = cursor.fetchall()
+    cursor.close()  # Might not get called if error occurs
+    return data
+
+# ✅ GOOD - Use context managers
+def good_query():
+    try:
+        with db.get() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("SELECT * FROM users")
+                return cursor.fetchall()
+    except Exception as e:
+        current_app.logger.error(f"Database error: {e}")
+        raise
+```
+
+5. **Implement Proper Error Handling and Logging**
+```python:app/routes.py
+@app.route('/api/create_user', methods=['POST'])
+def create_user():
+    try:
+        data = request.get_json()
+        with db.get() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "INSERT INTO users (name, email) VALUES (?, ?)",
+                    (data['name'], data['email'])
+                )
+                conn.commit()
+                return jsonify({'message': 'User created'}), 201
+                
+    except sqlite3.DatabaseError as e:
+        conn.rollback()  # Roll back on database errors
+        current_app.logger.error(f"Database error: {e}")
+        return jsonify({'error': 'Database operation failed'}), 500
+    except KeyError as e:
+        current_app.logger.error(f"Missing field: {e}")
+        return jsonify({'error': f'Missing required field: {e}'}), 400
+```
+
+6. **Handle Transactions Properly**
+```python:app/routes.py
+# ❌ BAD - No transaction management
+def bad_transaction():
+    conn = sqlite3.connect('database.db')
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET balance = balance - 100 WHERE id = 1")
+    cur.execute("UPDATE users SET balance = balance + 100 WHERE id = 2")
+    conn.commit()
+
+# ✅ GOOD - Proper transaction handling
+def good_transaction():
+    try:
+        with sqlite3.connect('database.db') as conn:
+            with conn.cursor() as cur:
+                cur.execute("BEGIN TRANSACTION")
+                try:
+                    cur.execute("UPDATE users SET balance = balance - ? WHERE id = ?", (100, 1))
+                    cur.execute("UPDATE users SET balance = balance + ? WHERE id = ?", (100, 2))
+                    conn.commit()
+                except Exception as e:
+                    conn.rollback()
+                    raise
+    except sqlite3.Error as e:
+        current_app.logger.error(f"Transaction failed: {e}")
+        raise
+```
+
