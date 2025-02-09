@@ -1,24 +1,22 @@
-## Setting up the database
+## Install
 
 ```sh
-invoke init-db
+pip install -r requirements.txt
 ```
 
-This will do the following:
-- create the words.db (Sqlite3 database)
-- run the migrations found in `seeds/`
-- run the seed data found in `seed/`
+## Setup DB
 
-Please note that migrations and seed data is manually coded to be imported in the `lib/db.py`. So you need to modify this code if you want to import other seed data.
+To set up the database, follow the following steps:
+This separates the data creation process from db creation, so the data is only imported when needed
 
-## Clearing the database
+```
+1. Delete db/app.db file
+2. Run python init_db.py
+3. Run python import_seed_data.py
+```
 
-Simply delete the `words.db` to clear entire database.
-
-## Running the backend api
+## Run
 
 ```sh
-python app.py 
+python app.py
 ```
-
-This should start the flask app on port `5000`

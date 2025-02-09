@@ -4,6 +4,8 @@
 pip install -r requirements.txt
 ```
 
+# backend-flask
+
 ## Setup DB
 
 To set up the database, follow the following steps:
@@ -20,3 +22,8 @@ This separates the data creation process from db creation, so the data is only i
 ```sh
 python app.py
 ```
+
+# frontend-react
+
+## Run
+
