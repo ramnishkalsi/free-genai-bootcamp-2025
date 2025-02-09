@@ -59,6 +59,16 @@ class Db:
     cursor.execute(self.sql('setup/create_table_study_sessions.sql'))
     self.get().commit()
 
+  def empty_tables(self,cursor):
+    cursor.execute('''Delete from study_activities''')
+    cursor.execute('''Delete from groups''')
+    cursor.execute('''Delete from words''')
+    cursor.execute('''Delete from word_groups''')
+    cursor.execute('''Delete from word_review_items''')
+    cursor.execute('''Delete from word_reviews''')
+    self.get().commit()
+
+
   def import_study_activities_json(self,cursor,data_json_path):
     study_actvities = self.load_json(data_json_path)
     for activity in study_actvities:
@@ -68,6 +78,7 @@ class Db:
     self.get().commit()
 
   def import_word_json(self,cursor,group_name,data_json_path):
+
       # Insert a new group
       cursor.execute('''
         INSERT INTO groups (name) VALUES (?)
@@ -114,6 +125,7 @@ class Db:
     with app.app_context():
       cursor = self.cursor()
       self.setup_tables(cursor)
+      self.empty_tables(cursor)
       self.import_word_json(
         cursor=cursor,
         group_name='Core Verbs',
