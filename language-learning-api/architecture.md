@@ -1,4 +1,4 @@
-# Language Learning API - ArchiMate Diagram
+# Language Learning API - Architecture Diagram
 
 ## Application Layer
 
