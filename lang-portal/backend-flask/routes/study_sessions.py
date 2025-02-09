@@ -151,6 +151,73 @@ def load(app):
     except Exception as e:
       return jsonify({"error": str(e)}), 500
 
+  @app.route('/api/study-sessions', methods=['POST'])
+  @cross_origin()
+  def create_study_session():
+    try:
+      # Extract data from request
+      data = request.get_json()
+      group_id = data.get('group_id')
+      study_activity_id = data.get('study_activity_id')
+      created_at = data.get('created_at', datetime.now())
+
+      # Basic validation
+      if not group_id or not study_activity_id:
+        return jsonify({"error": "group_id and study_activity_id are required"}), 400
+
+      cursor = app.db.cursor()
+      
+      # Validate group exists
+      cursor.execute('SELECT id FROM groups WHERE id = ?', (group_id,))
+      if not cursor.fetchone():
+        return jsonify({"error": f"Group with id {group_id} not found"}), 404
+      
+      # Validate activity exists  
+      cursor.execute('SELECT id FROM study_activities WHERE id = ?', (study_activity_id,))
+      if not cursor.fetchone():
+        return jsonify({"error": f"Activity with id {study_activity_id} not found"}), 404
+
+      # Insert the new study session
+      cursor.execute('''
+        INSERT INTO study_sessions (group_id, study_activity_id, created_at)
+        VALUES (?, ?, ?)
+      ''', (group_id, study_activity_id, created_at))
+      
+      session_id = cursor.lastrowid
+      app.db.commit()
+
+      # Fetch the created session details
+      cursor.execute('''
+        SELECT 
+          ss.id,
+          ss.group_id,
+          g.name as group_name,
+          sa.id as activity_id,
+          sa.name as activity_name,
+          ss.created_at,
+          0 as review_items_count
+        FROM study_sessions ss
+        JOIN groups g ON g.id = ss.group_id
+        JOIN study_activities sa ON sa.id = ss.study_activity_id
+        WHERE ss.id = ?
+      ''', (session_id,))
+      
+      session = cursor.fetchone()
+
+      return jsonify({
+        'id': session['id'],
+        'group_id': session['group_id'],
+        'group_name': session['group_name'],
+        'activity_id': session['activity_id'],
+        'activity_name': session['activity_name'],
+        'start_time': session['created_at'],
+        'end_time': session['created_at'],  # For now, just use the same time
+        'review_items_count': session['review_items_count']
+      }), 201
+        
+    except Exception as e:
+      return jsonify({"error": str(e)}), 500
+
   # todo POST /study_sessions/:id/review
 
   @app.route('/api/study-sessions/reset', methods=['POST'])
