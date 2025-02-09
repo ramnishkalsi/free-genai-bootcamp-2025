@@ -130,5 +130,10 @@ class Db:
         data_json_path='seed/study_activities.json'
       )
 
+def get_db_connection():
+    conn = sqlite3.connect('db/app.db')
+    conn.row_factory = sqlite3.Row
+    return conn
+
 # Create an instance of the Db class
 db = Db()
