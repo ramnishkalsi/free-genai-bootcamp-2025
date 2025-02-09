@@ -218,7 +218,46 @@ def load(app):
     except Exception as e:
       return jsonify({"error": str(e)}), 500
 
-  # todo POST /study_sessions/:id/review
+  @app.route('/api/study-sessions/<id>/review', methods=['POST'])
+  @cross_origin()
+  def create_study_session_review(id):
+    try:
+      # Extract data from request
+      data = request.get_json()
+      word_id = data.get('word_id')
+      correct = data.get('correct')
+      
+      # Validate required fields
+      if word_id is None or correct is None:
+        return jsonify({"error": "word_id and correct status are required"}), 400
+
+      cursor = app.db.cursor()
+      
+      # Validate study session exists
+      cursor.execute('SELECT id FROM study_sessions WHERE id = ?', (id,))
+      if not cursor.fetchone():
+        return jsonify({"error": f"Study session with id {id} not found"}), 404
+      
+      # Validate word exists
+      cursor.execute('SELECT id FROM words WHERE id = ?', (word_id,))
+      if not cursor.fetchone():
+        return jsonify({"error": f"Word with id {word_id} not found"}), 404
+
+      # Insert the review item
+      cursor.execute('''
+        INSERT INTO word_review_items (study_session_id, word_id, correct, created_at)
+        VALUES (?, ?, ?, ?)
+      ''', (id, word_id, 1 if correct else 0, datetime.now()))
+      
+      app.db.commit()
+
+      return jsonify({
+        "message": "Review recorded successfully",
+        "review_id": cursor.lastrowid
+      }), 201
+        
+    except Exception as e:
+      return jsonify({"error": str(e)}), 500
 
   @app.route('/api/study-sessions/reset', methods=['POST'])
   @cross_origin()
