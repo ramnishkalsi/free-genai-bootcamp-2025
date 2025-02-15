@@ -19,7 +19,6 @@ https://marketplace.visualstudio.com/items?itemName=Mebrahtom.plantumlpreviewer
 
 
 ### plantuml
-
 https://plantuml.com/
 
 This needs JRE and graphviz packages installed.
