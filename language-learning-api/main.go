@@ -21,6 +21,7 @@ func main() {
     r.GET("/study_sessions/:id", GetStudySession)
     r.POST("/study_sessions", CreateStudySession)
     r.POST("/study_sessions/:id/review", ReviewWord)
+    r.DELETE("/study_sessions/reset", ResetStudySessions)
 
     r.Run(":8080")
 }
@@ -102,4 +103,42 @@ func ReviewWord(c *gin.Context) {
     }
     
     c.JSON(201, review)
-} 
+}
+
+// ResetStudySessions deletes all study sessions and their associated reviews
+func ResetStudySessions(c *gin.Context) {
+    // Begin transaction
+    tx := db.Begin()
+
+    // Delete all word reviews first (due to foreign key constraint)
+    if err := tx.Exec("DELETE FROM word_review_items").Error; err != nil {
+        tx.Rollback()
+        c.JSON(500, gin.H{"error": "Failed to delete word reviews"})
+        return
+    }
+
+    // Delete all study sessions
+    if err := tx.Exec("DELETE FROM study_sessions").Error; err != nil {
+        tx.Rollback()
+        c.JSON(500, gin.H{"error": "Failed to delete study sessions"})
+        return
+    }
+
+    // Reset auto-increment counters
+    if err := tx.Exec("UPDATE sqlite_sequence SET seq = 0 WHERE name IN ('study_sessions', 'word_review_items')").Error; err != nil {
+        tx.Rollback()
+        c.JSON(500, gin.H{"error": "Failed to reset auto-increment"})
+        return
+    }
+
+    // Commit transaction
+    if err := tx.Commit().Error; err != nil {
+        tx.Rollback()
+        c.JSON(500, gin.H{"error": "Failed to commit transaction"})
+        return
+    }
+
+    c.JSON(200, gin.H{
+        "message": "Successfully reset all study sessions and reviews",
+    })
+}

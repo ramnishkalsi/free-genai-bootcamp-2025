@@ -1,16 +1,28 @@
 package models
 
 import (
+	"database/sql/driver"
+	"encoding/json"
 	"time"
 	"gorm.io/gorm"
 )
 
+type StringArray []string
+
+func (a *StringArray) Scan(value interface{}) error {
+	return json.Unmarshal(value.([]byte), a)
+}
+
+func (a StringArray) Value() (driver.Value, error) {
+	return json.Marshal(a)
+}
+
 type Word struct {
-	ID      uint   `gorm:"primaryKey"`
-	Kanji   string `gorm:"not null"`
-	Romaji  string `gorm:"not null"`
-	English string `gorm:"not null"`
-	Parts   string `gorm:"type:json"`
+	ID      uint       `gorm:"primaryKey"`
+	Kanji   string     `gorm:"not null"`
+	Romaji  string     `gorm:"not null"`
+	English string     `gorm:"not null"`
+	Parts   StringArray `gorm:"type:text" json:"parts"`
 }
 
 type Group struct {

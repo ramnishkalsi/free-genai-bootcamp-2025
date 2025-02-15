@@ -1,0 +1,64 @@
+{
+    "groups": [
+        {
+            "ID": 1,
+            "Name": "Nature Elements",
+            "WordsCount": 5,
+            "Words": [
+                {"Kanji": "水", "Romaji": "mizu", "English": "water", "Parts": ["氵", "水"]},
+                {"Kanji": "火", "Romaji": "hi", "English": "fire", "Parts": ["火"]},
+                {"Kanji": "土", "Romaji": "tsuchi", "English": "earth", "Parts": ["土"]},
+                {"Kanji": "金", "Romaji": "kin", "English": "gold/metal", "Parts": ["金"]},
+                {"Kanji": "木", "Romaji": "ki", "English": "tree/wood", "Parts": ["木"]}
+            ]
+        },
+        {
+            "ID": 2,
+            "Name": "Weather",
+            "WordsCount": 5,
+            "Words": [
+                {"Kanji": "雨", "Romaji": "ame", "English": "rain", "Parts": ["雨"]},
+                {"Kanji": "風", "Romaji": "kaze", "English": "wind", "Parts": ["風"]},
+                {"Kanji": "雪", "Romaji": "yuki", "English": "snow", "Parts": ["雨", "⻖"]},
+                {"Kanji": "雲", "Romaji": "kumo", "English": "cloud", "Parts": ["雨", "云"]},
+                {"Kanji": "霧", "Romaji": "kiri", "English": "fog", "Parts": ["雨", "務"]}
+            ]
+        },
+        {
+            "ID": 3,
+            "Name": "Landscape",
+            "WordsCount": 5,
+            "Words": [
+                {"Kanji": "山", "Romaji": "yama", "English": "mountain", "Parts": ["山"]},
+                {"Kanji": "川", "Romaji": "kawa", "English": "river", "Parts": ["川"]},
+                {"Kanji": "海", "Romaji": "umi", "English": "sea", "Parts": ["氵", "毎"]},
+                {"Kanji": "谷", "Romaji": "tani", "English": "valley", "Parts": ["谷"]},
+                {"Kanji": "島", "Romaji": "shima", "English": "island", "Parts": ["山", "鳥"]}
+            ]
+        },
+        {
+            "ID": 4,
+            "Name": "Celestial",
+            "WordsCount": 5,
+            "Words": [
+                {"Kanji": "日", "Romaji": "hi", "English": "sun", "Parts": ["日"]},
+                {"Kanji": "月", "Romaji": "tsuki", "English": "moon", "Parts": ["月"]},
+                {"Kanji": "星", "Romaji": "hoshi", "English": "star", "Parts": ["日", "生"]},
+                {"Kanji": "空", "Romaji": "sora", "English": "sky", "Parts": ["空"]},
+                {"Kanji": "虹", "Romaji": "niji", "English": "rainbow", "Parts": ["虫", "工"]}
+            ]
+        },
+        {
+            "ID": 5,
+            "Name": "Plants",
+            "WordsCount": 5,
+            "Words": [
+                {"Kanji": "花", "Romaji": "hana", "English": "flower", "Parts": ["艹", "化"]},
+                {"Kanji": "草", "Romaji": "kusa", "English": "grass", "Parts": ["艹", "早"]},
+                {"Kanji": "竹", "Romaji": "take", "English": "bamboo", "Parts": ["竹"]},
+                {"Kanji": "森", "Romaji": "mori", "English": "forest", "Parts": ["木", "木", "木"]},
+                {"Kanji": "林", "Romaji": "hayashi", "English": "woods", "Parts": ["木", "木"]}
+            ]
+        }
+    ]
+} 
