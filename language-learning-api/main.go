@@ -16,6 +16,9 @@ func main() {
     r.GET("/words", GetWords)
     r.GET("/groups", GetGroups)
     r.GET("/groups/:id", GetGroupWords)
+
+    r.GET("/study_sessions", GetStudySessions)
+    r.GET("/study_sessions/:id", GetStudySession)
     r.POST("/study_sessions", CreateStudySession)
     r.POST("/study_sessions/:id/review", ReviewWord)
 
@@ -29,6 +32,19 @@ func GetWords(c *gin.Context) {
     c.JSON(200, words)
 }
 
+func GetStudySession(c *gin.Context) {
+    var session models.StudySession
+    id := c.Param("id")
+    db.First(&session, id)
+    c.JSON(200, session)
+}
+
+// GetStudySessions returns all study sessions
+func GetStudySessions(c *gin.Context) {
+    var sessions []models.StudySession
+    db.Find(&sessions)
+    c.JSON(200, sessions)
+}
 // GetGroups returns all groups
 func GetGroups(c *gin.Context) {
     var groups []models.Group

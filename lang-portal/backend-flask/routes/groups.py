@@ -3,7 +3,7 @@ from flask_cors import cross_origin
 import json
 
 def load(app):
-  @app.route('/groups', methods=['GET'])
+  @app.route('/api/groups', methods=['GET'])
   @cross_origin()
   def get_groups():
     try:

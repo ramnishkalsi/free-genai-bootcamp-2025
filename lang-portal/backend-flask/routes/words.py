@@ -4,7 +4,7 @@ import json
 
 def load(app):
   # Endpoint: GET /words with pagination (50 words per page)
-  @app.route('/words', methods=['GET'])
+  @app.route('/api/words', methods=['GET'])
   @cross_origin()
   def get_words():
     try:
