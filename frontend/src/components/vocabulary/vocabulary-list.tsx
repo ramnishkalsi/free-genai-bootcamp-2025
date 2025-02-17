@@ -16,36 +16,44 @@ interface VocabularyListProps {
 }
 
 export function VocabularyList({ vocabularies }: VocabularyListProps) {
-  const filteredVocabularies = vocabularies;
+  const [search, setSearch] = useState("");
+
+  const filteredVocabularies = vocabularies.flatMap(vocab => 
+    vocab.Words?.filter(word => 
+      word.English.toLowerCase().includes(search.toLowerCase()) ||
+      word.Kanji.toLowerCase().includes(search.toLowerCase()) ||
+      word.Romaji.toLowerCase().includes(search.toLowerCase()) ||
+      vocab.Name.toLowerCase().includes(search.toLowerCase())
+    ).map(word => ({ ...word, groupName: vocab.Name })) || []
+  );
 
   return (
     <div className="space-y-4">
-      {/* <Input
+      <Input
         placeholder="Search vocabulary..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className="max-w-sm"
-      /> */}
+      />
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Group</TableHead>
+            <TableHead>English</TableHead>
             <TableHead>Kanji</TableHead>
             <TableHead>Romaji</TableHead>
-            <TableHead>English</TableHead>
+            
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredVocabularies.flatMap((vocab) =>
-            vocab.Words?.map((word) => (
-              <TableRow key={`${vocab.ID}-${word.ID}`}>
-                <TableCell className="font-medium">{vocab.Name}</TableCell>
-                <TableCell>{word.Kanji}</TableCell>
-                <TableCell>{word.Romaji}</TableCell>
-                <TableCell>{word.English}</TableCell>
-              </TableRow>
-            )) || []
-          )}
+          {filteredVocabularies.map((word) => (
+            <TableRow key={`${word.ID}`}>
+              <TableCell className="font-medium">{word.groupName}</TableCell>
+              <TableCell>{word.English}</TableCell>
+              <TableCell>{word.Kanji}</TableCell>
+              <TableCell>{word.Romaji}</TableCell>
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
     </div>
