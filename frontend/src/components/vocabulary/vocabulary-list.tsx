@@ -8,7 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+// import { Badge } from "@/components/ui/badge";
 import type { Vocabulary } from "@/types";
 
 interface VocabularyListProps {
@@ -16,50 +16,36 @@ interface VocabularyListProps {
 }
 
 export function VocabularyList({ vocabularies }: VocabularyListProps) {
-  const [search, setSearch] = useState("");
-
-  const filteredVocabularies = vocabularies.filter((vocab) =>
-    vocab.word.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredVocabularies = vocabularies;
 
   return (
     <div className="space-y-4">
-      <Input
+      {/* <Input
         placeholder="Search vocabulary..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className="max-w-sm"
-      />
+      /> */}
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Word</TableHead>
-            <TableHead>Definition</TableHead>
-            <TableHead>Category</TableHead>
-            <TableHead>Difficulty</TableHead>
+            <TableHead>Group</TableHead>
+            <TableHead>Kanji</TableHead>
+            <TableHead>Romaji</TableHead>
+            <TableHead>English</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredVocabularies.map((vocab) => (
-            <TableRow key={vocab.id}>
-              <TableCell className="font-medium">{vocab.word}</TableCell>
-              <TableCell>{vocab.definition}</TableCell>
-              <TableCell>{vocab.category}</TableCell>
-              <TableCell>
-                <Badge
-                  variant={
-                    vocab.difficulty === "beginner"
-                      ? "default"
-                      : vocab.difficulty === "intermediate"
-                      ? "secondary"
-                      : "destructive"
-                  }
-                >
-                  {vocab.difficulty}
-                </Badge>
-              </TableCell>
-            </TableRow>
-          ))}
+          {filteredVocabularies.flatMap((vocab) =>
+            vocab.Words?.map((word) => (
+              <TableRow key={`${vocab.ID}-${word.ID}`}>
+                <TableCell className="font-medium">{vocab.Name}</TableCell>
+                <TableCell>{word.Kanji}</TableCell>
+                <TableCell>{word.Romaji}</TableCell>
+                <TableCell>{word.English}</TableCell>
+              </TableRow>
+            )) || []
+          )}
         </TableBody>
       </Table>
     </div>

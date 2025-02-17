@@ -1,10 +1,7 @@
 export interface Vocabulary {
-  id: string;
-  word: string;
-  definition: string;
-  examples: string[];
-  category: string;
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  ID: string;
+  Name: string;
+  Words: VocabularyWord[];
 }
 
 export interface PracticeRecord {
@@ -22,4 +19,12 @@ export interface LearningApp {
   icon: string;
   url: string;
   category: string;
+}
+
+export interface VocabularyWord {
+  ID: string;
+  Kanji: string;
+  Romaji: string;
+  English: string;
+  parts: string[];
 }

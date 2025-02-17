@@ -12,6 +12,21 @@ var db = database.InitDB()
 func main() {
     r := gin.Default()
 
+    // Add CORS middleware
+    r.Use(func(c *gin.Context) {
+        c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
+        c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+        c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+        c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+        
+        if c.Request.Method == "OPTIONS" {
+            c.AbortWithStatus(204)
+            return
+        }
+        
+        c.Next()
+    })
+
     // Define routes
     r.GET("/words", GetWords)
     r.GET("/groups", GetGroups)
@@ -46,10 +61,11 @@ func GetStudySessions(c *gin.Context) {
     db.Find(&sessions)
     c.JSON(200, sessions)
 }
-// GetGroups returns all groups
+// GetGroups returns all groups with their associated words
 func GetGroups(c *gin.Context) {
     var groups []models.Group
-    db.Find(&groups)
+    // Preload the Words relationship for all groups
+    db.Preload("Words").Find(&groups)
     c.JSON(200, groups)
 }
 

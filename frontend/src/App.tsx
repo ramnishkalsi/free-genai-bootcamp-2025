@@ -3,27 +3,10 @@ import { VocabularyList } from "@/components/vocabulary/vocabulary-list";
 import { AppGrid } from "@/components/apps/app-grid";
 import { StatsCard } from "@/components/dashboard/stats-card";
 import { Brain, Book, Trophy, Gamepad2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Vocabulary } from "@/types";
 
-// Mock data - replace with API calls
-const mockVocabularies = [
-  {
-    id: "1",
-    word: "Ephemeral",
-    definition: "Lasting for a very short time",
-    examples: ["The ephemeral nature of fashion trends"],
-    category: "Advanced Vocabulary",
-    difficulty: "advanced",
-  },
-  {
-    id: "2",
-    word: "Ubiquitous",
-    definition: "Present, appearing, or found everywhere",
-    examples: ["Mobile phones are now ubiquitous"],
-    category: "Advanced Vocabulary",
-    difficulty: "advanced",
-  },
-] as const;
-
+// Keep mockApps for now since we don't have an API endpoint for it yet
 const mockApps = [
   {
     id: "1",
@@ -41,9 +24,50 @@ const mockApps = [
     url: "#",
     category: "Games",
   },
-] as const;
+];
 
 function App() {
+  const [vocabularies, setVocabularies] = useState<Vocabulary[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    console.clear(); // Clear previous logs
+    console.log('Component mounted'); // Verify useEffect is running
+
+    const fetchVocabularies = async () => {
+      try {
+        console.log('Fetching vocabularies...');
+        const response = await fetch('http://localhost:8080/groups', {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Origin': 'http://localhost:5173',
+          },
+          mode: 'cors',
+          credentials: 'include',
+        });
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch vocabularies');
+        }
+        
+        const data = await response.json();
+        console.log('Received data:', data);
+        setVocabularies(data);
+      } catch (err) {
+        console.error('Fetch error:', err);
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchVocabularies();
+  }, []);
+
   return (
     <div className="min-h-screen bg-background p-8">
       <header className="mb-8">
@@ -79,10 +103,16 @@ function App() {
       <Tabs defaultValue="vocabulary" className="space-y-4">
         <TabsList>
           <TabsTrigger value="vocabulary">Vocabulary</TabsTrigger>
-          <TabsTrigger value="apps">Learning Apps</TabsTrigger>
+
         </TabsList>
         <TabsContent value="vocabulary">
-          <VocabularyList vocabularies={mockVocabularies} />
+          {isLoading ? (
+            <div>Loading vocabularies...</div>
+          ) : error ? (
+            <div className="text-red-500">Error: {error}</div>
+          ) : (
+            <VocabularyList vocabularies={vocabularies} />
+          )}
         </TabsContent>
         <TabsContent value="apps">
           <AppGrid apps={mockApps} />
