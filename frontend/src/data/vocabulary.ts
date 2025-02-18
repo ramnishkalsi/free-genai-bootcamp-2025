@@ -1,14 +1,29 @@
 import { VocabularyItem } from '@/types/vocabulary';
 
-export const vocabularyList: VocabularyItem[] = [
-  { japanese: '猫', english: 'cat', romaji: 'neko' },
-  { japanese: '犬', english: 'dog', romaji: 'inu' },
-  { japanese: '本', english: 'book', romaji: 'hon' },
-  { japanese: '水', english: 'water', romaji: 'mizu' },
-  { japanese: '食べる', english: 'eat', romaji: 'taberu' },
-  { japanese: '飲む', english: 'drink', romaji: 'nomu' },
-  { japanese: '家', english: 'house', romaji: 'ie' },
-  { japanese: '車', english: 'car', romaji: 'kuruma' },
-  { japanese: '学校', english: 'school', romaji: 'gakkou' },
-  { japanese: '友達', english: 'friend', romaji: 'tomodachi' },
-];
+interface ApiVocabularyItem {
+  ID: number;
+  Kanji: string;
+  English: string;
+  Romaji: string;
+  Parts: string[];
+}
+
+async function fetchVocabularyList(): Promise<VocabularyItem[]> {
+  try {
+    const response = await fetch('http://localhost:8080/words'); // Adjust the API endpoint as needed
+    const data: ApiVocabularyItem[] = await response.json();
+    
+    return data.map(item => ({
+      id: item.ID,
+      japanese: item.Kanji,
+      english: item.English,
+      romaji: item.Romaji,
+      parts: item.Parts
+    }));
+  } catch (error) {
+    console.error('Error fetching vocabulary:', error);
+    return [];
+  }
+}
+
+export { fetchVocabularyList };

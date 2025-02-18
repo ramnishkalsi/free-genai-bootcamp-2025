@@ -1,7 +1,9 @@
 export interface VocabularyItem {
+  id: number;
   japanese: string;
   english: string;
-  romaji?: string;
+  romaji: string;
+  parts: string[];
 }
 
 export interface GameState {

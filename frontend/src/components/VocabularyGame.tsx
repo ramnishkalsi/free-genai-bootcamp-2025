@@ -1,14 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { vocabularyList } from '@/data/vocabulary';
-import type { GameState } from '@/types/vocabulary';
+import { fetchVocabularyList } from '@/data/vocabulary';
+import type { GameState, VocabularyItem } from '@/types/vocabulary';
 import { Check, X, ArrowRight, RefreshCcw, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 function VocabularyGame() {
   const navigate = useNavigate();
+  const [vocabulary, setVocabulary] = useState<VocabularyItem[]>([]);
   const [gameState, setGameState] = useState<GameState>({
     currentIndex: 0,
     score: 0,
@@ -17,7 +18,11 @@ function VocabularyGame() {
     showAnswer: false,
   });
 
-  const currentWord = vocabularyList[gameState.currentIndex];
+  useEffect(() => {
+    fetchVocabularyList().then(setVocabulary);
+  }, []);
+
+  const currentWord = vocabulary[gameState.currentIndex] || { japanese: '', english: '', romaji: '', parts: [] };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,7 +37,7 @@ function VocabularyGame() {
   };
 
   const nextWord = () => {
-    const nextIndex = (gameState.currentIndex + 1) % vocabularyList.length;
+    const nextIndex = (gameState.currentIndex + 1) % vocabulary.length;
     setGameState({
       currentIndex: nextIndex,
       score: gameState.score,
@@ -70,7 +75,7 @@ function VocabularyGame() {
               Japanese Vocabulary
             </h1>
             <p className="text-gray-500 dark:text-gray-400">
-              Score: {gameState.score}/{vocabularyList.length}
+              Score: {gameState.score}/{vocabulary.length}
             </p>
           </div>
 
